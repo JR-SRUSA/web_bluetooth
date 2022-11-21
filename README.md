@@ -2,8 +2,8 @@ Web Bluetooth and ESP32 BLE
 ===========================
 
 2022-11-20
-John Robinson
-SRUSA
+
+John Robinson, SRUSA
 
 This sample code directory shows how to use Web Bluetooth with an external ESP32 microcontroller. It should serve as a
 template for further development. In order to use WebBluetooth, you need to serve the website via HTTPS, so there is a
@@ -31,6 +31,7 @@ Generate an HTTPS server with self-signed certificate
 -----------------------------------------------------
 
 Generate a server.pem file:
+
     $ openssl req -new -x509 -keyout key.pem -out server.pem -days 365 -nodes
     Generating a RSA private key
     .+++++
@@ -53,6 +54,7 @@ Generate a server.pem file:
     Email Address []:j_robinson@sumitomorubber-usa.com
 
 Run the Python file:
+
     $ python https_server.py
 
 Connect in the browser:
