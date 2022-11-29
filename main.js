@@ -10,6 +10,20 @@ var bt_server,
       optionalServices: ['4fafc201-1fb5-459e-8fcc-c5c9c331914b'], // ble notify
     };
 
+var known_characteristics = [],
+    known_services = [];
+// Known Bluetooth Service and Characteristic ids
+fetch('./bluetooth_ids.json')
+  .then((response) => response.json())
+  .then((json) => {
+    console.log(json)
+    known_characteristics = json['characteristics'];
+    known_services = json['services'];
+
+    bt_request_options.optionalServices.push(
+      known_services.find(el => el.name === "distance").uuid  // find uuid of service named "distance"
+    )
+  });
 
 bt_button.addEventListener('pointerup', function(event) {
   // Call navigator.bluetooth.requestDevice

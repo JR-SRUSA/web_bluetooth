@@ -1,0 +1,18 @@
+{
+  "services": [
+    {
+      "name": "distance",
+      "identifier": "com.srusa.bt.services.distance",
+      "uuid": "0b78a01a-ca44-4d03-83ab-bf0be8100c96",
+      "source": "srusa"
+    }
+  ],
+  "characteristics": [
+    {
+      "name": "distance_mm",
+      "identifier": "com.srusa.bt.characteristics.distance_mm",
+      "uuid": "c0611c61-bad5-4269-a08c-7f921984c843",
+      "source": "srusa"
+    }
+  ]
+}
