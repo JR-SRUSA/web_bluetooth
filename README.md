@@ -1,7 +1,7 @@
 Web Bluetooth and ESP32 BLE
 ===========================
 
-2022-11-20
+2022-12-12
 
 John Robinson, SRUSA
 
@@ -25,11 +25,47 @@ working example in case the examples are changed in the future.
 described in the 'Generate an HTTPS server with self-signed certificate' section below.
 3.  main.html and main.js -> Files which generate the Web Bluetooth website. html file specifies the layout, javascript
 (js) file contains the code necessary for web bluetooth.
+4.  bluetooth_ids.json -> Contains service and property UUIDs in JSON format. 
 
 
 Generate an HTTPS server with self-signed certificate
 -----------------------------------------------------
 
+From bottom answer here: https://stackoverflow.com/questions/21297139/how-do-you-sign-a-certificate-signing-request-with-your-certification-authority/21340898#21340898
+
+    $ openssl req -x509 -days 365 -newkey rsa:4096 -keyout ca_private_key.pem -out ca_cert.pem
+    $ openssl req -new -newkey rsa:4096 -keyout my_private_key.pem -out my_cert_req.pem
+    $ openssl x509 -req -in my_cert_req.pem -days 365 -CA ca_cert.pem -CAkey ca_private_key.pem -CAcreateserial -out my_signed_cert.pem
+    -> Then use certfile="tmpssl/my_signed_cert.pem",    keyfile="tmpssl/my_private_key.pem", in https.py
+    # TODO: Figure out CN (Common Name) vs SAN (Subject Alternate Name) issue. Seems like in newer versions of FF you 
+    #   need SAN 
+    # From Here: https://stackoverflow.com/questions/10175812/how-to-generate-a-self-signed-ssl-certificate-using-openssl
+    $ openssl req -x509 -newkey rsa:4096 -sha256 -days 3650 -nodes \
+      -keyout example.key -out example.crt -subj "/CN=example.com" \
+      -addext "subjectAltName=DNS:example.com,DNS:www.example.net,IP:10.0.0.1"
+
+
+
+Install certificate authority on Windows:
+
+    1. Windows + R -> mmc [enter]
+    2. File > Add/Remove Snap-in
+    3. Certificates > Add
+    4. Compter Account > Next
+    5. Local Computer > Finish > OK
+    6. Certificates (local computer) 2x
+    7. Trusted Root Certification Authorities, Right Click Certificates (middle under Object Type) > All Tasks > Import
+    8. Next > Browse (select 'All Files' in file type). Select srusaFEA_CA.pem > Open > Next
+    9. Place all certificates in the following store 'Trusted Root Certification Authorities store' > Next > Finish
+
+OR Install certificate on browser:
+    
+    Firefox: Options -> Privacy and Security -> View Certificates -> Import CA.pem (check trust CA)
+    Chrome: ???
+
+
+Original Method, shows 'insecure' warning when going to website
+---------------------------------------------------------------
 Generate a server.pem file:
 
     $ openssl req -new -x509 -keyout key.pem -out server.pem -days 365 -nodes
@@ -63,3 +99,9 @@ Connect in the browser:
 
 To Enable BT in Chrome:
     about://flags -> enable #experimental-web-platform-features
+
+
+Updates
+-------
+2022-12-12: 
+* Trying to generate a local CA to sign the certificates, so you don't have to click 'Proceed Anyway, Unsafe'
