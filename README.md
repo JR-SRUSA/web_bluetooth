@@ -30,20 +30,65 @@ described in the 'Generate an HTTPS server with self-signed certificate' section
 
 Generate an HTTPS server with self-signed certificate
 -----------------------------------------------------
+CA:
 
-From bottom answer here: https://stackoverflow.com/questions/21297139/how-do-you-sign-a-certificate-signing-request-with-your-certification-authority/21340898#21340898
-
-    $ openssl req -x509 -days 365 -newkey rsa:4096 -keyout ca_private_key.pem -out ca_cert.pem
-    $ openssl req -new -newkey rsa:4096 -keyout my_private_key.pem -out my_cert_req.pem
-    $ openssl x509 -req -in my_cert_req.pem -days 365 -CA ca_cert.pem -CAkey ca_private_key.pem -CAcreateserial -out my_signed_cert.pem
-    -> Then use certfile="tmpssl/my_signed_cert.pem",    keyfile="tmpssl/my_private_key.pem", in https.py
-    # TODO: Figure out CN (Common Name) vs SAN (Subject Alternate Name) issue. Seems like in newer versions of FF you 
-    #   need SAN 
-    # From Here: https://stackoverflow.com/questions/10175812/how-to-generate-a-self-signed-ssl-certificate-using-openssl
-    $ openssl req -x509 -newkey rsa:4096 -sha256 -days 3650 -nodes \
-      -keyout example.key -out example.crt -subj "/CN=example.com" \
-      -addext "subjectAltName=DNS:example.com,DNS:www.example.net,IP:10.0.0.1"
-
+    $ openssl req -x509 -days 365 -newkey rsa:4096 -keyout ca_private_key.pem -out ca_cert.pem -nodes
+    Generating a RSA private key
+    .........++++
+    .................................++++
+    writing new private key to 'ca_private_key.pem'
+    -----
+    You are about to be asked to enter information that will be incorporated
+    into your certificate request.
+    What you are about to enter is what is called a Distinguished Name or a DN.
+    There are quite a few fields but you can leave some blank
+    For some fields there will be a default value,
+    If you enter '.', the field will be left blank.
+    -----
+    Country Name (2 letter code) [AU]:US
+    State or Province Name (full name) [Some-State]:NY
+    Locality Name (eg, city) []:BUF
+    Organization Name (eg, company) [Internet Widgits Pty Ltd]:SRUSA
+    Organizational Unit Name (eg, section) []:RnD
+    Common Name (e.g. server FQDN or YOUR name) []:localhost
+    Email Address []:jr@srusa.com
+    $ ls
+    ca_cert.pem  ca_private_key.pem
+    $
+    $ openssl req -new -newkey rsa:4096 -keyout my_private_key.pem -out my_cert_req.pem -addext "subjectAltName=IP:127.0.0.1,DNS:localhost" -nodes
+    Generating a RSA private key
+    ............................................................++++
+    .....................................................................................................................++++
+    writing new private key to 'my_private_key.pem'
+    -----
+    You are about to be asked to enter information that will be incorporated
+    into your certificate request.
+    What you are about to enter is what is called a Distinguished Name or a DN.
+    There are quite a few fields but you can leave some blank
+    For some fields there will be a default value,
+    If you enter '.', the field will be left blank.
+    -----
+    Country Name (2 letter code) [AU]:US
+    State or Province Name (full name) [Some-State]:NY
+    Locality Name (eg, city) []:BUF
+    Organization Name (eg, company) [Internet Widgits Pty Ltd]:SRUSA
+    Organizational Unit Name (eg, section) []:RnD
+    Common Name (e.g. server FQDN or YOUR name) []:localhost
+    Email Address []:jr@srusa.com
+    
+    Please enter the following 'extra' attributes
+    to be sent with your certificate request
+    A challenge password []:
+    An optional company name []:
+    $ ls
+    ca_cert.pem  ca_private_key.pem  my_cert_req.pem  my_private_key.pem
+    $ # Create/ Copy the domains.ext file
+    $ ls
+    ca_cert.pem  ca_private_key.pem  domains.ext  my_cert_req.pem  my_private_key.pem
+    $ openssl x509 -req -in my_cert_req.pem -days 365 -CA ca_cert.pem -CAkey ca_private_key.pem -CAcreateserial -extfile domains.ext -out my_signed_cert2.pem
+    Signature ok
+    subject=C = US, ST = NY, L = BUF, O = SRUSA, OU = RnD, CN = localhost, emailAddress = jr@srusa.com
+    Getting CA Private Key
 
 
 Install certificate authority on Windows:
@@ -60,34 +105,9 @@ Install certificate authority on Windows:
 
 OR Install certificate on browser:
     
-    Firefox: Options -> Privacy and Security -> View Certificates -> Import CA.pem (check trust CA)
+    Firefox: Options -> Privacy and Security -> View Certificates -> Import ca_cert.pem (check trust CA)
     Chrome: ???
 
-
-Original Method, shows 'insecure' warning when going to website
----------------------------------------------------------------
-Generate a server.pem file:
-
-    $ openssl req -new -x509 -keyout key.pem -out server.pem -days 365 -nodes
-    Generating a RSA private key
-    .+++++
-    ..........+++++
-    writing new private key to 'key.pem'
-    -----
-    You are about to be asked to enter information that will be incorporated
-    into your certificate request.
-    What you are about to enter is what is called a Distinguished Name or a DN.
-    There are quite a few fields but you can leave some blank
-    For some fields there will be a default value,
-    If you enter '.', the field will be left blank.
-    -----
-    Country Name (2 letter code) [AU]:US
-    State or Province Name (full name) [Some-State]:NY
-    Locality Name (eg, city) []:Buffalo
-    Organization Name (eg, company) [Internet Widgits Pty Ltd]:SRUSA
-    Organizational Unit Name (eg, section) []:Design
-    Common Name (e.g. server FQDN or YOUR name) []:John
-    Email Address []:j_robinson@sumitomorubber-usa.com
 
 Run the Python file:
 
