@@ -1,7 +1,7 @@
 Web Bluetooth and ESP32 BLE
 ===========================
 
-2022-12-12
+2022-12-15
 
 John Robinson, SRUSA
 
@@ -25,7 +25,8 @@ working example in case the examples are changed in the future.
 described in the 'Generate an HTTPS server with self-signed certificate' section below.
 3.  main.html and main.js -> Files which generate the Web Bluetooth website. html file specifies the layout, javascript
 (js) file contains the code necessary for web bluetooth.
-4.  bluetooth_ids.json -> Contains service and property UUIDs in JSON format. 
+4.  bluetooth_ids.json -> Contains service and property UUIDs in JSON format.
+5.  certificates/domains.ext -> Contains the Subject Alternate Names (SAN, ex. IP address or URL) for the HTTPS certificate. 
 
 
 Generate an HTTPS server with self-signed certificate
@@ -100,13 +101,13 @@ Install certificate authority on Windows:
     5. Local Computer > Finish > OK
     6. Certificates (local computer) 2x
     7. Trusted Root Certification Authorities, Right Click Certificates (middle under Object Type) > All Tasks > Import
-    8. Next > Browse (select 'All Files' in file type). Select srusaFEA_CA.pem > Open > Next
+    8. Next > Browse (select 'All Files' in file type). Select ca_cert.pem > Open > Next
     9. Place all certificates in the following store 'Trusted Root Certification Authorities store' > Next > Finish
 
 OR Install certificate on browser:
     
     Firefox: Options -> Privacy and Security -> View Certificates -> Import ca_cert.pem (check trust CA)
-    Chrome: ???
+    Chrome: Register the certificate authority on Windows per above process
 
 
 Run the Python file:
@@ -115,13 +116,16 @@ Run the Python file:
 
 Connect in the browser:
     https://localhost:4443/main.html
-    -> You will need to 'Accept the Risk' if your certificate is self generated and not set as trusted
+    -> You will need to 'Accept the Risk' if your certificate is self generated and not set as trusted (see above to 
+    create a trusted CA on Windows/ Chrome or Firefox)
 
 To Enable BT in Chrome:
     about://flags -> enable #experimental-web-platform-features
 
+Note: WebBluetooth currently doesn't work in Firefox. (https://caniuse.com/web-bluetooth)
+
 
 Updates
 -------
-2022-12-12: 
-* Trying to generate a local CA to sign the certificates, so you don't have to click 'Proceed Anyway, Unsafe'
+2022-12-15: 
+* Local Certificate authority directions work for creating trusted certificates on local installs
